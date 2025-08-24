@@ -38,6 +38,13 @@ void main(final List<String> arguments) async {
         help: 'Output directory to save the generate UML file',
         valueHelp: 'output_dir',
         defaultsTo: './uml')
+    ..addMultiOption('exclde-files',
+        abbr: 'e',
+        help: 'Files to exclude from analysis, this will try to match the'
+            ' end of the file(s) found in the input directories, '
+            'specify multiple with additional -e options',
+        valueHelp: 'exclude_files',
+        defaultsTo: [])
     ..addFlag('verbose', abbr: 'v', help: 'Verbose output', negatable: false);
   final ArgResults argsResults;
   try {
@@ -63,5 +70,6 @@ void main(final List<String> arguments) async {
   final reporter = Reporter.file(reportTo, converter);
   final analyzer = CodeUml(reporter: reporter, logger: logger);
 
-  analyzer.analyze(input.toList(growable: false));
+  analyzer.analyze(input.toList(growable: false),
+      excludeFiles: argsResults['exclde-files'] as List<String>);
 }

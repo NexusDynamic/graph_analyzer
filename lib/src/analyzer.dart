@@ -39,11 +39,26 @@ class CodeUml {
     return files;
   }
 
-  Future<void> analyze(final List<String> dirsPath) async {
+  Future<void> analyze(final List<String> dirsPath,
+      {final List<String> excludeFiles = const []}) async {
     if (dirsPath.isEmpty) {
       throw Exception('Directories are not specified');
     }
     final includedPaths = _getFilePathsFromDir(dirsPath).toList();
+    // Exclude specified files
+    if (excludeFiles.isNotEmpty) {
+      final matchedExculdes = includedPaths.where((final path) {
+        return excludeFiles.any((final exclude) => path.endsWith(exclude));
+      }).toList();
+      if (matchedExculdes.isNotEmpty) {
+        logger.info('Excluding files:', onlyVerbose: false);
+        for (final exclude in matchedExculdes) {
+          logger.info('\t$exclude', onlyVerbose: false);
+          includedPaths.remove(exclude);
+        }
+      }
+    }
+
     final classesDef = <ClassDef>[];
     final collection = AnalysisContextCollection(includedPaths: includedPaths);
 
