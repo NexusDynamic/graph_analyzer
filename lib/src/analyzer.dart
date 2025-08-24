@@ -23,7 +23,7 @@ class CodeUml {
   List<String> _getFilePathsFromDir(final List<String> dirsPath) {
     final files = <String>[];
     for (final dirPath in dirsPath) {
-      final dir = Directory(dirPath);
+      final dir = Directory(dirPath).absolute;
 
       dir.listSync(recursive: true).forEach((final fileEntity) {
         if (fileEntity.statSync().type != FileSystemEntityType.file ||
@@ -31,7 +31,8 @@ class CodeUml {
           return;
         }
 
-        final path = fileEntity.path;
+        final path = fileEntity.absolute.resolveSymbolicLinksSync();
+
         files.add(path);
       });
     }
@@ -69,9 +70,9 @@ class CodeUml {
 
   /// Analyzes a class for methods, fields, inheritance, implementations, and dependencies
   ClassDef _analyzeClass(final ClassDeclaration classDeclaration) {
-    final extendsOf = classDeclaration.extendsClause?.superclass.name2.lexeme;
+    final extendsOf = classDeclaration.extendsClause?.superclass.name.lexeme;
     final implementsOf = classDeclaration.implementsClause?.interfaces
-            .map((final e) => e.name2.lexeme)
+            .map((final e) => e.name.lexeme)
             .toList() ??
         [];
     final classDef = ClassDef();
@@ -79,6 +80,9 @@ class CodeUml {
     classDef.extendsOf = extendsOf;
     classDef.isAbstract = classDeclaration.abstractKeyword != null;
     classDef.implementsOf.addAll(implementsOf);
+    classDef.isInterface = classDeclaration.interfaceKeyword != null;
+    classDef.isMixin = classDeclaration.mixinKeyword != null;
+
     for (final member in classDeclaration.members) {
       if (member is MethodDeclaration) {
         classDef.methods.add(_analyzeMethod(member));
