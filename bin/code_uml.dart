@@ -38,7 +38,7 @@ void main(final List<String> arguments) async {
         help: 'Output directory to save the generate UML file',
         valueHelp: 'output_dir',
         defaultsTo: './uml')
-    ..addMultiOption('exclde-files',
+    ..addMultiOption('exclude-files',
         abbr: 'e',
         help: 'Files to exclude from analysis, this will try to match the'
             ' end of the file(s) found in the input directories, '
@@ -71,5 +71,5 @@ void main(final List<String> arguments) async {
   final analyzer = CodeUml(reporter: reporter, logger: logger);
 
   analyzer.analyze(input.toList(growable: false),
-      excludeFiles: argsResults['exclde-files'] as List<String>);
+      excludeFiles: argsResults['exclude-files'] as List<String>);
 }
